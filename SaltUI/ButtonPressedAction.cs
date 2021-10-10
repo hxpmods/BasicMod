@@ -18,9 +18,8 @@ namespace BasicMod.SaltUI
             this.window = window;
         }
 
-        public void Press( int buttonId)
+        public virtual void Press( int buttonId)
         {
-            //Debug.Log("no?");
             if (closeWindow)
             {
                 window.isOkButtonClicked = true;

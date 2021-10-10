@@ -35,7 +35,7 @@ namespace BasicMod.SaltUI
 
         public static Vector2 PreventOutOfTheScreenPosition(ScrollWindow SW, ScrollWindowContentController contentController)
         {
-            Vector2 result = (Vector2)Utility.Reflection.InvokePrivateMethod(SW, "PreventOutOfTheScreenPosition", new object[] {contentController });
+            Vector2 result = (Vector2)Utility.Reflection.InvokePrivateMethod(SW, "PreventOutOfTheScreenPosition", new object[] { contentController });
             return result;
         }
 
@@ -58,7 +58,7 @@ namespace BasicMod.SaltUI
             if (CC != null)
 
             {
-               
+
                 __instance.currentContentController = CC;
 
                 Utility.Reflection.InvokePrivateMethod(__instance, "UpdateLayers");
@@ -79,7 +79,7 @@ namespace BasicMod.SaltUI
 
 
                 //Set title
-                
+
                 if (!CC.parameters.titleKey.Equals(string.Empty))
                 {
                     Key titleKey = new Key(CC.parameters.titleKey, CC.parameters.titleParameters);
@@ -102,70 +102,21 @@ namespace BasicMod.SaltUI
                     }
 
                 }
-                
+
                 localPosition.y += ((hintSection != null) ? hintSection.margin.y : 0f) - hintPadding.y;
 
                 Utility.Reflection.SetPrivateField<float>(__instance, "targetBottomRollYPosition", localPosition.y);
-      
-                Utility.Reflection.SetPrivateField<Vector2>(__instance, "targetPosition",  SaltUI.PreventOutOfTheScreenPosition(__instance, CC));
+
+                Utility.Reflection.SetPrivateField<Vector2>(__instance, "targetPosition", SaltUI.PreventOutOfTheScreenPosition(__instance, CC));
 
                 CC.OnHintPreparingEnd();
                 return false;
 
-           }
+            }
 
 
             return true;
 
-        }
-    }
-
-    [HarmonyPatch(typeof(GameManager), "StartNewGame")]
-    public static class NewGameEvent
-    {
-        static bool Prefix()
-        {
-            Managers.Menu.CloseMenu();
-            Managers.SaveLoad.LoadNewGameState();
-            Managers.SaveLoad.SelectedProgressState = null;
-
-
-
-
-            //Ignore the tutorial and add our window
-            //These windows should work in tutorials as is, but also work with ScrollWindow.Open
-            ModHintParameters param = new ModHintParameters();
-
-            
-
-            param.anchorPosition = new Vector2(0, 5);
-            param.titleKey = "basicmodwelcome";
-            LocalDict.AddKeyToDictionary("basicmodwelcome", "Greetings, Alchemist.");
-
-            var text1 = new TextWindowElement();
-            text1.text = "basicmoddesc1";
-            LocalDict.AddKeyToDictionary("basicmoddesc1", "Welcome back.\n Are you ready to settle into your next life?");
-
-            var text2 = new TextWindowElement();
-            text2.text = "basicmoddesc2";
-            LocalDict.AddKeyToDictionary("basicmoddesc2", "");
-
-            var button1 = new OptionWithButtonWindowElement();
-            button1.text = "This is an option.";
-            var button2 = new OptionWithButtonWindowElement();
-            button2.text = "This is another option.";
-
-            param.scrollWindowElements.Add(text1);
-            param.scrollWindowElements.Add(text2);
-            param.scrollWindowElements.Add(button1);
-            param.scrollWindowElements.Add(button2);
-            param.scrollWindowElements.Add(button1);
-            param.scrollWindowElements.Add(button2);
-            param.buttonPressedAction = new ButtonPressedAction(Managers.Game.scrollWindow);
-
-            ScrollWindow.Open(new ModScrollWindowContentController(param));
-            
-            return false;
         }
     }
 }
