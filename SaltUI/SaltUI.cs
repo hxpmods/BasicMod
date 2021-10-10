@@ -131,9 +131,13 @@ namespace BasicMod.SaltUI
 
 
 
+
             //Ignore the tutorial and add our window
             //These windows should work in tutorials as is, but also work with ScrollWindow.Open
             ModHintParameters param = new ModHintParameters();
+
+            
+
             param.anchorPosition = new Vector2(0, 5);
             param.titleKey = "basicmodwelcome";
             LocalDict.AddKeyToDictionary("basicmodwelcome", "Greetings, Alchemist.");
@@ -157,8 +161,10 @@ namespace BasicMod.SaltUI
             param.scrollWindowElements.Add(button2);
             param.scrollWindowElements.Add(button1);
             param.scrollWindowElements.Add(button2);
+            param.buttonPressedAction = new ButtonPressedAction(Managers.Game.scrollWindow);
 
             ScrollWindow.Open(new ModScrollWindowContentController(param));
+            
             return false;
         }
     }

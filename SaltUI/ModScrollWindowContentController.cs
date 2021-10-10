@@ -8,15 +8,25 @@ using System.Text;
 using System.Threading.Tasks;
 using TutorialSystem;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace BasicMod.SaltUI
 {
     public class ModScrollWindowContentController : ScrollWindowContentController
     {
 
+        public class IDEvent : UnityEvent<int>
+        {
+        }
+
+        public IDEvent OnModButtonPressEvent = new IDEvent();
         public ModScrollWindowContentController(ModHintParameters parameters)
         : base(parameters)
         {
+            if (parameters.buttonPressedAction != null)
+            {
+                OnModButtonPressEvent.AddListener(parameters.buttonPressedAction.Press);
+            }
         }
 
         public List<ScrollWindowButton> currentButtons = new List<ScrollWindowButton>();
@@ -51,7 +61,8 @@ namespace BasicMod.SaltUI
 
         public void OnModButtonPress(int buttonId)
         {
-            Debug.Log(buttonId);
+            OnModButtonPressEvent.Invoke(buttonId);
+            //Debug.Log(buttonId);
         }
 
         public override void OnHintPreparingEnd()

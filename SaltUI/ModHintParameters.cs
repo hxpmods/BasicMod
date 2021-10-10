@@ -10,5 +10,7 @@ namespace BasicMod.SaltUI
     public class ModHintParameters : HintParameters
     {
         public List<AbstractWindowElement> scrollWindowElements = new List<AbstractWindowElement>();
+        public ButtonPressedAction buttonPressedAction;
+
     }
 }
