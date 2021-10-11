@@ -5,6 +5,7 @@ using BasicMod.GameHooks;
 using BasicMod.SaltUI;
 using BasicMod.SaltUI.WindowElements;
 using ScrollWindowHint;
+using TutorialSystem;
 
 namespace BasicMod
 {
@@ -111,6 +112,13 @@ namespace BasicMod
 			ModSalt dsalt = SaltFactory.CreateSalt("Default Salt");
 			//Default salt end
 
+		}
+
+		public static void ForceTutorialStart(TutorialSet tutorial)
+        {
+			Managers.Tutorial.DisableTutorial();
+			tutorial.SetStart();
+			Managers.Tutorial.tutorialActiveIsChanged.Invoke();
 		}
 
 	}
