@@ -8,12 +8,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TutorialSystem;
 using UnityEngine;
 
 namespace BasicMod.SaltUI
 {
     public class SaltUI
     {
+
+        public static ObjectManipulator.Enum[] objectManipButtonGroup = new ObjectManipulator.Enum[] { ObjectManipulator.Enum.RecipeBookButton,
+                    ObjectManipulator.Enum.TalentsButton,
+                    ObjectManipulator.Enum.LegendaryRecipesButton,
+                    ObjectManipulator.Enum.GoalsButton,
+                    ObjectManipulator.Enum.ManualButton,
+                    ObjectManipulator.Enum.ShopUpgradesButton,
+                    ObjectManipulator.Enum.CalendarButton};
 
         public static Vector2 InstantiateText(ScrollWindow SW, Vector2 localPosition, string textKey, bool marginStart = true, bool marginEnd = true, Vector2 offset = new Vector2())
         {
@@ -26,6 +35,21 @@ namespace BasicMod.SaltUI
             Vector2 result = (Vector2)Utility.Reflection.InvokePrivateMethod(SW, "InstantiateTitle", new object[] { localPosition, titleKey, marginStart, marginEnd });
             return result;
         }
+
+
+        public static Vector2 InstantiateSprite(ScrollWindow SW, Vector2 localPosition, Sprite sprite, bool marginStart = true, bool marginEnd = true)
+        {
+            Vector2 result = (Vector2)Utility.Reflection.InvokePrivateMethod(SW, "InstantiateSprite", new object[] { localPosition, sprite, marginStart, marginEnd });
+            return result;
+        }
+
+        public static Vector2 InstantiateDivider(ScrollWindow SW, Vector2 localPosition, bool marginStart = true, bool marginEnd = true)
+        {
+            Sprite sprite = Utility.Reflection.GetPrivateField<Sprite>(SW, "dividerSprite");
+            Vector2 result = (Vector2)Utility.Reflection.InvokePrivateMethod(SW, "InstantiateSprite", new object[] { localPosition, sprite, marginStart, marginEnd });
+            return result;
+        }
+
 
         public static Vector2 InstantiateButton(ScrollWindow SW, Vector2 localPosition, bool marginStart = true, bool marginEnd = true, Vector2 offset = new Vector2())
         {
@@ -43,6 +67,18 @@ namespace BasicMod.SaltUI
         {
             GameObject button = Utility.Reflection.GetPrivateField<GameObject>(SW, "okButton");
             return button;
+        }
+
+        public static void SetObjectsLock(ObjectManipulator.Enum[] objects, bool locked)
+        {
+            if (objects == null || objects.Length == 0)
+            {
+                return;
+            }
+            foreach (ITutorialManipulated @object in ObjectManipulator.GetObjects(objects))
+            {
+                @object.LockedByTutorial = locked;
+            }
         }
 
     }
@@ -97,7 +133,6 @@ namespace BasicMod.SaltUI
 
                     if (hintSection is ButtonSection)
                     {
-                        Debug.Log("We made it");
                         CC.currentButtons.Add((hintSection as ButtonSection).button);
                     }
 
@@ -110,6 +145,15 @@ namespace BasicMod.SaltUI
                 Utility.Reflection.SetPrivateField<Vector2>(__instance, "targetPosition", SaltUI.PreventOutOfTheScreenPosition(__instance, CC));
 
                 CC.OnHintPreparingEnd();
+
+
+
+                //Locks game buttons
+                if (parameters.lockGameButtons)
+                {
+                    SaltUI.SetObjectsLock(SaltUI.objectManipButtonGroup, true);
+                }
+
                 return false;
 
             }
@@ -117,6 +161,25 @@ namespace BasicMod.SaltUI
 
             return true;
 
+        }
+    }
+
+    [HarmonyPatch(typeof(ScrollWindow), "Close")]
+    class ModScrollWindowClose{
+
+        static void Postfix()
+        {
+            ScrollWindow scrollWindow = Managers.Game.scrollWindow;
+            ModScrollWindowContentController CC = scrollWindow.currentContentController as ModScrollWindowContentController;
+            if (CC != null)
+            {
+                var parameters = CC.parameters as ModHintParameters;
+                //Unlocks game buttons
+                if (parameters.lockGameButtons)
+                {
+                    SaltUI.SetObjectsLock(SaltUI.objectManipButtonGroup, false);
+                }
+            }
         }
     }
 }

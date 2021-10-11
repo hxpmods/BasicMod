@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace BasicMod.SaltUI
 {
-    class StartTutorialButtonAction : ButtonPressedAction
+    public class StartTutorialButtonAction : ButtonPressedAction
     {
         public StartTutorialButtonAction(ScrollWindow window) : base(window)
         {
@@ -19,7 +19,8 @@ namespace BasicMod.SaltUI
             base.Press(buttonId);
             if (buttonId == 0)
             {
-                Managers.Tutorial.StartTutorialSet("Tutorial Set Main");
+                //Managers.Tutorial.StartTutorialSet("Tutorial Set Main");
+                Debug.Log("remove me");
             }
         }
     }

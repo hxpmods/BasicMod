@@ -11,6 +11,7 @@ namespace BasicMod.SaltUI
     {
         public List<AbstractWindowElement> scrollWindowElements = new List<AbstractWindowElement>();
         public ButtonPressedAction buttonPressedAction;
+        public bool lockGameButtons = true; 
 
     }
 }

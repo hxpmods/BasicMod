@@ -21,10 +21,8 @@ namespace BasicMod
 			Debug.Log("Loaded BasicMod!");
 			DuplicateRecipes.Awake();
 
-			LocalDict.AddKeyToDictionary("stuff", "Greetings, Alchemist.");
-			LocalDict.AddKeyToDictionary("stuff2", "Welcome back.\n Are you ready to settle into your next life?");
 
-
+			/*
 			NewGameEvent.OnNewGame += (_, e) =>
 			{
 				// Mark the event handled so the game's own code doesnt run.
@@ -73,11 +71,11 @@ namespace BasicMod
 				param.buttonPressedAction = new StartTutorialButtonAction(Managers.Game.scrollWindow);
 
 				ScrollWindow.Open(new ModScrollWindowContentController(param));
+			
 
+			};*/
 
-
-
-			};
+			
 
 		}
 
