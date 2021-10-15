@@ -1,20 +1,38 @@
-﻿using HarmonyLib;
+﻿using BasicMod.GameHooks;
+using HarmonyLib;
+using System;
 using System.Collections.Generic;
 using TMPAtlasGenerationSystem;
 using UnityEngine;
 
-namespace BasicMod
+namespace BasicMod.Factories
 {
+    public class PreRegisterSaltEventArgs : EventArgs { };
     public class SaltFactory
     {
         //All modded salts
         public static List<ModSalt> allSalts = new List<ModSalt>();
+        public static EventHandler<PreRegisterSaltEventArgs> onPreRegisterSaltEvent;
 
         //These will be loaded when vanilla salts are 
         public static GameObject salt_prefab;
         public static GameObject salt_amountText;
         public static GameObject salt_pile;
         public static ItemFromInventoryPreset salt_soundPreset;
+
+
+        public static void Awake()
+        {
+            SaltManagerInitEvent.OnSaltManagerInit += (_, e) =>
+            {
+                //Copy the data from the first salt object, then add our salts.
+                SaltFactory.CopyGameObjectsFromSalt((Salt.allSalts[1]));
+
+                PreRegisterSaltEventArgs a = new PreRegisterSaltEventArgs();
+                SaltFactory.onPreRegisterSaltEvent?.Invoke(null, a);
+                SaltFactory.RegisterAllSalts();
+            };
+        }
 
         public static void CopyGameObjectsFromSalt(Salt salt)
         {
@@ -67,34 +85,7 @@ namespace BasicMod
 
     }
 
-    //Harmony patches start
 
-    [HarmonyPatch(typeof(Salt))]
-    [HarmonyPatch("Initialize")]
-    class _SaltFactoryInitPatch
-    {
-        static void Postfix()
-        {
-            //Copy the data from the first salt object, then add our salts.
-            SaltFactory.CopyGameObjectsFromSalt((Salt.allSalts[1]));
-            //BasicMod.LogSalts();
-            //BasicMod.AddSalts();
-
-
-
-        }
-    }
-
-    [HarmonyPatch(typeof(GameManager))]
-    [HarmonyPatch("Start")]
-    class SaltFactoryGameManagerPatch
-    {
-        static void Postfix()
-        {
-            SaltFactory.RegisterAllSalts();
-        }
-
-    }
 
     [HarmonyPatch(typeof(SaltItem))]
     [HarmonyPatch("SpawnNewItem")]
@@ -124,4 +115,9 @@ namespace BasicMod
             }
         }
     }
+
+
+
 }
+
+

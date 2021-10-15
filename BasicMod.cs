@@ -6,6 +6,7 @@ using BasicMod.SaltUI;
 using BasicMod.SaltUI.WindowElements;
 using ScrollWindowHint;
 using TutorialSystem;
+using BasicMod.Factories;
 
 namespace BasicMod
 {
@@ -20,10 +21,14 @@ namespace BasicMod
 		{
 			DoPatching();
 			Debug.Log("Loaded BasicMod!");
+
 			DuplicateRecipes.Awake();
+			SaltFactory.Awake();
+			LegendaryRecipeFactory.Awake();
+			GoalFactory.Awake();
+			TalentFactory.Awake();
 
-
-			/*
+			
 			NewGameEvent.OnNewGame += (_, e) =>
 			{
 				// Mark the event handled so the game's own code doesnt run.
@@ -74,9 +79,15 @@ namespace BasicMod
 				ScrollWindow.Open(new ModScrollWindowContentController(param));
 			
 
-			};*/
+			};
 
-			
+			SaltFactory.onPreRegisterSaltEvent += (_, e) =>
+			{
+				ModSalt dsalt = SaltFactory.CreateSalt("Default Salt");
+			};
+
+
+
 
 		}
 
@@ -109,7 +120,7 @@ namespace BasicMod
 		public static void RegisterSalts()
 		{
 			//Default salt start
-			ModSalt dsalt = SaltFactory.CreateSalt("Default Salt");
+			//ModSalt dsalt = SaltFactory.CreateSalt("Default Salt");
 			//Default salt end
 
 		}

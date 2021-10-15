@@ -3,7 +3,7 @@
 
 namespace BasicMod.Utility
 {
-    class Reflection
+    public static class Reflection
     {
           
         public static T GetPrivateField<T>(object instance, string fieldName)

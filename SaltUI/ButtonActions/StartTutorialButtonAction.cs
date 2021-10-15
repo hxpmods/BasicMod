@@ -1,4 +1,5 @@
-﻿using ScrollWindowHint;
+﻿using Books.GoalsBook;
+using ScrollWindowHint;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,8 +20,7 @@ namespace BasicMod.SaltUI
             base.Press(buttonId);
             if (buttonId == 0)
             {
-                //Managers.Tutorial.StartTutorialSet("Tutorial Set Main");
-                Debug.Log("remove me");
+                Managers.Tutorial.StartTutorialSet("Tutorial Set Main");
             }
         }
     }

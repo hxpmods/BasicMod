@@ -15,7 +15,6 @@ namespace BasicMod.SaltUI
 
 		protected override void OnStepStart()
 		{
-			Debug.Log("We are here?");
 			ScrollWindow.Open(new ModScrollWindowContentController(hintParameters));
 		}
 		public override bool DoneCondition(object input = null)

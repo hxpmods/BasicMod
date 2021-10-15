@@ -39,7 +39,6 @@ namespace BasicMod
         {
             if (bookmarkClicked)
             {
-                Debug.Log("Hi?");
 
                 if (Input.GetKey(KeyCode.LeftControl))
                 {

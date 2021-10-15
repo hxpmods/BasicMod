@@ -1,20 +1,56 @@
-﻿using HarmonyLib;
+﻿using BasicMod.GameHooks;
+using HarmonyLib;
 using LegendaryRecipes;
 using QuestSystem.DesiredItems;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BasicMod
+namespace BasicMod.Factories
 {
-    public class LegendaryRecipeFactory
+    public class LegendaryRecipeFactory 
     {
         public static List<ModLegendaryRecipe> allRecipes = new List<ModLegendaryRecipe>();
         public static GameObject legendarySaltPilePrefab;
         public static ItemFromInventoryPreset saltPile_soundPreset;
 
+        public static EventHandler<EventArgs> onPreRegisterRecipes;
+        public static EventHandler<EventArgs> onPreConfigureRecipes;
+
+        public static void Awake()
+        {
+            LegendaryRecipeObjectEvents.OnStart += (_, e) =>
+            {
+                Debug.Log("Registering Recipes");
+                onPreRegisterRecipes?.Invoke(_, new EventArgs());
+                RegisterAllRecipes();
+                RegisterRecipesAsKnownAtStart();
+                RegisterAllStartingRecipes();
+            };
+
+            LegendaryRecipeObjectEvents.OnLoad += (_, e) =>
+            {
+                //Register our extra recipes that should be known at start to old saves.
+                foreach (LegendaryRecipe recipe in LegendaryRecipeFactory.allRecipes)
+                {
+                    if (Managers.Ingredient.settings.knownLegendaryRecipesOnStart.Contains(recipe))
+                    {
+                        Debug.Log(recipe.name);
+                        Managers.Ingredient.legendaryRecipeSubManager.legendaryRecipeObject.AddLegendaryRecipe(recipe);
+                        if (recipe.unlockedByDefault) { Managers.Ingredient.legendaryRecipeSubManager.UnlockRecipe(recipe); }
+                    }
+                }
+            };
+
+            InitiatePotionEffectsEvent.OnInitiate += (_, e) =>
+            {
+                onPreConfigureRecipes?.Invoke(_, new EventArgs());
+            };
+        }
+
         public static void CopyGameObjects()
         {
-            Debug.Log("Copying recipe game objects");
+            //Debug.Log("Copying recipe game objects");
             legendarySaltPilePrefab = AlchemyMachineProduct.allProducts[5].prefab;
             saltPile_soundPreset = AlchemyMachineProduct.allProducts[5].soundPreset;
         }
@@ -71,7 +107,7 @@ namespace BasicMod
             {
                 if (recipe.knownAtStart)
                 {
-                    Debug.Log("Registering " + recipe.name + " as known at start.");
+                    //Debug.Log("Registering " + recipe.name + " as known at start.");
                     Managers.Ingredient.settings.knownLegendaryRecipesOnStart.Add(recipe);
                 }
             }
@@ -109,7 +145,7 @@ namespace BasicMod
                 //Debug.Log(recipe);
                 if (recipe.knownAtStart)
                 {
-                    Debug.Log("Adding " + recipe.name + " to LegendaryRecipeObject at start.");
+                    //Debug.Log("Adding " + recipe.name + " to LegendaryRecipeObject at start.");
                     Managers.Ingredient.legendaryRecipeSubManager.legendaryRecipeObject.AddLegendaryRecipe(recipe);
                 }
             }
@@ -120,40 +156,6 @@ namespace BasicMod
 
     //Harmony patches start
 
-    [HarmonyPatch(typeof(LegendaryRecipeObject))]
-    [HarmonyPatch("Start")]
-    class AddRecipeAtStartPatch
-    {
-        static void Postfix()
-        {
-            Debug.Log("Registering Recipes as known at start.");
-            LegendaryRecipeFactory.RegisterRecipesAsKnownAtStart();
-            //Make modded recipes known in Legendary Recipe book at start up
-            LegendaryRecipeFactory.RegisterAllStartingRecipes();
-
-        }
-    }
-
-    [HarmonyPatch(typeof(LegendaryRecipeObject))]
-    [HarmonyPatch("OnLoad")]
-    class AddNewRecipesOnload
-    {
-        //If a recipe in this mod would be added on start, attempt to add it on load to ensure all recipes get added.
-        //The game already checks if a recipe is known to avoid duplicate legendary recipes.
-
-        static void Postfix()
-        {
-            foreach (LegendaryRecipe recipe in LegendaryRecipeFactory.allRecipes)
-            {
-                if (Managers.Ingredient.settings.knownLegendaryRecipesOnStart.Contains(recipe))
-                {
-                    Managers.Ingredient.legendaryRecipeSubManager.legendaryRecipeObject.AddLegendaryRecipe(recipe);
-                    if (recipe.unlockedByDefault) { Managers.Ingredient.legendaryRecipeSubManager.UnlockRecipe(recipe); }
-                }
-            }
-        }
-
-    }
 
 
     [HarmonyPatch(typeof(PotionManager))]
@@ -165,7 +167,7 @@ namespace BasicMod
             //BasicMod.LogEffects();
             //Recipes are then configured after the Potion Manager, to ensure we have full access to all potion effects.
             //This is where you define the recipes themselves, and further configure the result.
-            LegendaryRecipeFactory.RegisterAllRecipes();
+            //LegendaryRecipeFactory.RegisterAllRecipes();
         }
     }
 
@@ -181,6 +183,22 @@ namespace BasicMod
         }
     }
 
+
+    [HarmonyPatch(typeof(InventoryItem))]
+    [HarmonyPatch("GetByName")]
+    class AddAlchemyProductsToGetByName
+    {
+        static bool Prefix(string name, ref InventoryItem __result)
+        {
+            var byName = AlchemyMachineProduct.GetByName(name, returnFirst: false, warning: false);
+            if (byName != null)
+            {
+                __result = byName;
+                return false;
+            }
+            return true;
+        }
+    }
     //Harmony patches end
 }
 
