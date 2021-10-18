@@ -7,6 +7,7 @@ using BasicMod.SaltUI.WindowElements;
 using ScrollWindowHint;
 using TutorialSystem;
 using BasicMod.Factories;
+using BasicMod.JSON;
 
 namespace BasicMod
 {
@@ -22,12 +23,14 @@ namespace BasicMod
 			DoPatching();
 			Debug.Log("Loaded BasicMod!");
 
+			JSONQuestLoader.Awake();
 			DuplicateRecipes.Awake();
 			SaltFactory.Awake();
 			LegendaryRecipeFactory.Awake();
 			GoalFactory.Awake();
 			TalentFactory.Awake();
-
+			QuestFactory.Awake();
+			QuestFactory.doClearQuests = true;
 			
 			NewGameEvent.OnNewGame += (_, e) =>
 			{
