@@ -38,7 +38,7 @@ namespace BasicMod.Factories
                         LogTemplate(template);
                     }
                     */
-                    if (template.name == "FemaleQuests")
+                    if (template.name.EndsWith("Quests"))
                     {
                         BuffChanceForNecromancer(template);
                         //LogTemplate(template);
@@ -65,7 +65,7 @@ namespace BasicMod.Factories
 
         public static void BuffChanceForNecromancer(NpcTemplate template)
         {
-
+                
                 foreach (PartContainerGroup<NonAppearancePart> partGroup in template.groupsOfContainers)
                 {
 
@@ -75,8 +75,9 @@ namespace BasicMod.Factories
                         NpcTemplate container = partContainer.part as NpcTemplate;
                         if (container != null)
                         {
+                            Debug.Log($"Buffing chance for necromancer in {template.name} template.");
                             if (container.name.StartsWith("Necro")){
-                            partContainer.chanceBtwParts = 100f;
+                            partContainer.chanceBtwParts*= 4f;
                             }
                            
                         }
@@ -194,7 +195,7 @@ namespace BasicMod.Factories
                 }
             }
         }
-
+        /*
         public static bool TemplateUsesNecromancyQuests(NpcTemplate template)
         {
             bool flag = false;
@@ -220,7 +221,7 @@ namespace BasicMod.Factories
            
             return flag;
         }
-
+        */
         public static void LogTemplate(NpcTemplate template)
         {
 
