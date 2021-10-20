@@ -8,15 +8,17 @@ using ScrollWindowHint;
 using TutorialSystem;
 using BasicMod.Factories;
 using BasicMod.JSON;
+using BepInEx.Configuration;
 
 namespace BasicMod
 {
 	[BepInPlugin(pluginGuid, pluginName, pluginVersion)]
 	public class BasicMod : BaseUnityPlugin
 	{
+		public static ConfigEntry<bool> clearQuestConfig;
 		public const string pluginGuid = "potioncraft.basicmod";
 		public const string pluginName = "Basic Mod";
-		public const string pluginVersion = "0.0.0.1";
+		public const string pluginVersion = "0.0.2";
 
 		public void Awake()
 		{
@@ -30,7 +32,11 @@ namespace BasicMod
 			GoalFactory.Awake();
 			TalentFactory.Awake();
 			QuestFactory.Awake();
-			QuestFactory.doClearQuests = true;
+
+
+			clearQuestConfig = Config.Bind("BasicMod Settings", "clearVanillaQuests", false, "Clears Vanilla Groundhog day potion requests. Useful when developing a requests pack.");
+
+			QuestFactory.doClearQuests = clearQuestConfig.Value;
 			
 			NewGameEvent.OnNewGame += (_, e) =>
 			{
@@ -89,11 +95,7 @@ namespace BasicMod
 				ModSalt dsalt = SaltFactory.CreateSalt("Default Salt");
 			};
 
-
-
-
 		}
-
 
 		//HarmonyPatching
 		private void DoPatching()
@@ -119,14 +121,6 @@ namespace BasicMod
 			}
 		}
 
-		//Adds and intialises custom salts
-		public static void RegisterSalts()
-		{
-			//Default salt start
-			//ModSalt dsalt = SaltFactory.CreateSalt("Default Salt");
-			//Default salt end
-
-		}
 
 		public static void ForceTutorialStart(TutorialSet tutorial)
         {
@@ -137,16 +131,4 @@ namespace BasicMod
 
 	}
 
-
-	[HarmonyPatch(typeof(TradableUpgrade))]
-	[HarmonyPatch("Initialize")]
-	class SaltPatch
-	{
-		static void Postfix()
-		{
-			//Add our salts here
-			BasicMod.RegisterSalts();
-
-		}
-	}
 }
