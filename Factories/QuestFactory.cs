@@ -3,16 +3,19 @@ using Npc.Parts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
 namespace BasicMod.Factories
 {
-    class QuestFactory
+    public class QuestFactory
     {
         public static List<ModQuestMaker> allQuests = new List<ModQuestMaker>();
         public static EventHandler<EventArgs> onQuestsPreGenerate;
+        public static EventHandler<EventArgs> onQuestsPostGenerate;
+        public static EventHandler<EventArgs> onFactionsPreGenerate;
         public static bool doClearQuests = false;
 
         public static void Awake()
@@ -22,30 +25,17 @@ namespace BasicMod.Factories
 
                 if (doClearQuests) ClearQuestTemplates();
 
-               
 
                 EventArgs a = new EventArgs();
-                onQuestsPreGenerate?.Invoke(null, a);
+                onFactionsPreGenerate?.Invoke(null, a);
+
+                EventArgs b = new EventArgs();
+                onQuestsPreGenerate?.Invoke(null, b);
                 GenerateQuests();
                 AddQuests();
 
-                foreach (NpcTemplate template in NpcTemplate.allNpcTemplates)
-                {
-                    /*
-                    if (template.name == "Demo2GroundhogRandom_Npc")
-                    {
-                        Debug.Log("huh");
-                        LogTemplate(template);
-                    }
-                    */
-                    if (template.name.EndsWith("Quests"))
-                    {
-                        BuffChanceForNecromancer(template);
-                        //LogTemplate(template);
-                    }
-
-
-                }
+                EventArgs c = new EventArgs();
+                onQuestsPostGenerate?.Invoke(null, c);
 
             };
 
@@ -63,27 +53,34 @@ namespace BasicMod.Factories
             }
         }
 
-        public static void BuffChanceForNecromancer(NpcTemplate template)
+        public static void BuffChanceForNecromancer()
         {
-                
-                foreach (PartContainerGroup<NonAppearancePart> partGroup in template.groupsOfContainers)
-                {
 
-                    foreach (PartContainer<NonAppearancePart> partContainer in partGroup.partsInGroup)
+            foreach (NpcTemplate template in NpcTemplate.allNpcTemplates) {
+
+                if(template.name.EndsWith("Quests")){
+
+                    foreach (PartContainerGroup<NonAppearancePart> partGroup in template.groupsOfContainers)
                     {
-                    
-                        NpcTemplate container = partContainer.part as NpcTemplate;
-                        if (container != null)
+
+                        foreach (PartContainer<NonAppearancePart> partContainer in partGroup.partsInGroup)
                         {
-                            Debug.Log($"Buffing chance for necromancer in {template.name} template.");
-                            if (container.name.StartsWith("Necro")){
-                            partContainer.chanceBtwParts*= 4f;
+
+                            NpcTemplate container = partContainer.part as NpcTemplate;
+                            if (container != null)
+                            {
+                                Debug.Log($"Buffing chance for necromancer in {template.name} template.");
+                                if (container.name.StartsWith("Necro")) {
+                                    partContainer.chanceBtwParts *= 4f;
+                                }
+
                             }
-                           
                         }
+
                     }
 
                 }
+            }
       
         }
 
@@ -141,8 +138,6 @@ namespace BasicMod.Factories
 
 
         }
-
-
         public static void ConfigureQuests()
         {
             foreach (ModQuestMaker quest in allQuests)
@@ -195,40 +190,22 @@ namespace BasicMod.Factories
                 }
             }
         }
-        /*
-        public static bool TemplateUsesNecromancyQuests(NpcTemplate template)
-        {
-            bool flag = false;
-            
-            if (template.baseParts != null)
-            {
-                {
-                    foreach(NonAppearancePart part in template.baseParts)
-                    {
-                        if (part != null)
-                        {
-                            if (part.name.Contains("Quests"))
-                            {
-                                Debug.Log(part.name);
-                            }
-                        }
-                    }
 
-                }
-                
-            }
-
-           
-            return flag;
-        }
-        */
-        public static void LogTemplate(NpcTemplate template)
+        public static void LogTemplate(NpcTemplate template, bool iterate = true)
         {
 
 
                 Debug.Log("Begin logging NpcTemplate " + template);
+                
+                /*
+                if (template.appearance != null)
+                {
+                Debug.Log("Logging appearance for: " + template);
+                LogAppearanceContainer(template.appearance);
+                }
+                */
 
-
+                
                 Debug.Log("Logging non appearance parts for " + template.name);
                 bool flag = false;
                 foreach (NonAppearancePart part in template.baseParts)
@@ -237,7 +214,7 @@ namespace BasicMod.Factories
                     if (container != null)
                     {
                         Debug.Log("Found non random container " + container.name + " in " + template.name);
-                    LogTemplate(container);
+                        if (iterate) LogTemplate(container);
                     }
                     else
                     {
@@ -260,7 +237,11 @@ namespace BasicMod.Factories
                             Debug.Log(container);
                             Debug.Log("Found random container " + container.name+  " in " + template.name);
                             Debug.Log(container.spawnChance);
-                            LogTemplate(container);
+                            if (iterate) LogTemplate(container);
+
+
+                           if (container.name.Contains("Citizen")) LogTemplate(container);
+
                         }
                         else
                         {
@@ -272,6 +253,182 @@ namespace BasicMod.Factories
                 }
                 Debug.Log("Finished logging random non appearance parts for " + template.name);
                 Debug.Log("\n");
+        }
+
+        public static void LogAppearanceContainer(AppearanceContainer appearanceContainer)
+        {
+
+            Debug.Log("Logging aboveHairFeature1 parts");
+            foreach (PartContainer<Npc.Parts.Appearance.Accessories.AccessoryAboveHair> part in appearanceContainer.aboveHairFeature1.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging aboveHairFeature2 parts");
+            foreach (PartContainer<Npc.Parts.Appearance.Accessories.AccessoryAboveHair> part in appearanceContainer.aboveHairFeature2.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging behindBodyFeature1 parts");
+            foreach (var part in appearanceContainer.behindBodyFeature1.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging behindBodyFeature2 parts");
+            foreach (var part in appearanceContainer.behindBodyFeature2.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging body parts");
+            foreach (var part in appearanceContainer.body.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging bodyFeature1 parts");
+            foreach (var part in appearanceContainer.bodyFeature1.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging bodyFeature2 parts");
+            foreach (var part in appearanceContainer.bodyFeature2.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging breastSize parts ");
+            foreach (var part in appearanceContainer.breastSize.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging eyes parts ");
+            foreach (var part in appearanceContainer.eyes.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging face parts ");
+            foreach (var part in appearanceContainer.face.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging faceFeature1");
+            foreach (var part in appearanceContainer.faceFeature1.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging faceFeature2");
+            foreach (var part in appearanceContainer.faceFeature1.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging hairstyle");
+            foreach (var part in appearanceContainer.hairstyle.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging handBackFeature1");
+            foreach (var part in appearanceContainer.handBackFeature1.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging handBackFeature2");
+            foreach (var part in appearanceContainer.handBackFeature1.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging handFrontFeature1");
+            foreach (var part in appearanceContainer.handFrontFeature1.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging handFrontFeature2");
+            foreach (var part in appearanceContainer.handFrontFeature2.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging hat");
+            Debug.Log(appearanceContainer.hat.groupChance);
+            foreach (var part in appearanceContainer.hat.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging shortHairFeature1");
+            foreach (var part in appearanceContainer.shortHairFeature1.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging shortHairFeature2");
+            foreach (var part in appearanceContainer.shortHairFeature2.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging skullShape");
+            foreach (var part in appearanceContainer.skullShape.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging skullShapeFeature1");
+            foreach (var part in appearanceContainer.skullShapeFeature1.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging skullShapeFeature2");
+            foreach (var part in appearanceContainer.skullShapeFeature1.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+
+            Debug.Log("Logging skullShapeFeature3");
+            foreach (var part in appearanceContainer.skullShapeFeature1.partsInGroup)
+            {
+                Debug.Log(part.part.name);
+            }
+        }
+
+        public static NpcTemplate CreateEmptyNpcTemplate(string name)
+        {
+            var template = ScriptableObject.CreateInstance<NpcTemplate>();
+            template.name = name;
+            return template;
+        }
+
+        public static void AddTemplateToOtherTemplateContainerGroup(NpcTemplate toAdd, NpcTemplate addTo)
+        {
+            var partContainer = new PartContainer<NonAppearancePart>();
+            partContainer.part = toAdd;
+
+            var newPartsInGroup = new List<PartContainer<NonAppearancePart>>();
+            newPartsInGroup.Add(partContainer);
+            newPartsInGroup.AddRange(addTo.groupsOfContainers[0].partsInGroup);
+
+            addTo.groupsOfContainers[0].partsInGroup = newPartsInGroup.ToArray();
+
+            //Rebalance parts
+            foreach(var part in addTo.groupsOfContainers[0].partsInGroup)
+            {
+                part.chanceBtwParts = 100.0f / addTo.groupsOfContainers[0].partsInGroup.Count();
+            }
+
+
         }
 
     }
