@@ -68,8 +68,8 @@ namespace BasicMod.Factories
         {
             //Just salts for now
             LegendarySaltPile result = ScriptableObject.CreateInstance<LegendarySaltPile>();
-
-           result.soundPreset = saltPile_soundPreset;
+            result.name = _name;
+            result.soundPreset = saltPile_soundPreset;
            
            // result.visualObject = result.prefab.GetComponentInChildren<AlchemyMachineProductVisualObject>();
             return result;

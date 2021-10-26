@@ -8,9 +8,15 @@ namespace BasicMod
 {
     static public class SpriteLoader
     {
-        public static Sprite LoadSpriteFromFile(string filePath)
+        public static Sprite LoadSpriteFromFile(string filePath, string directory = null)
         {
-            var data = File.ReadAllBytes("BepinEx/Plugins/Assets/"+filePath);
+            bool overrideModFilePath = filePath.StartsWith("@");
+
+            if (directory == null || overrideModFilePath) directory = "BepinEx/Plugins/Assets/";
+            if (overrideModFilePath) filePath = filePath.Remove(0, 1);
+
+
+            var data = File.ReadAllBytes(directory+filePath);
             var tex = new Texture2D(2, 2);
             tex.filterMode = FilterMode.Bilinear;
             if (!tex.LoadImage(data))

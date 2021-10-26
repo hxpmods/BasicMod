@@ -26,7 +26,7 @@ namespace BasicMod.Factories
             SaltManagerInitEvent.OnSaltManagerInit += (_, e) =>
             {
                 //Copy the data from the first salt object, then add our salts.
-                SaltFactory.CopyGameObjectsFromSalt((Salt.allSalts[1]));
+                SaltFactory.CopyGameObjectsFromSalt((Salt.allSalts[0]));
 
                 PreRegisterSaltEventArgs a = new PreRegisterSaltEventArgs();
                 SaltFactory.onPreRegisterSaltEvent?.Invoke(null, a);
@@ -63,6 +63,7 @@ namespace BasicMod.Factories
 
             //Add salt to our factory (there's a chance we might not want to do this)
             AddSalt(salt);
+            LocalDict.AddKeyToDictionary(_name, _name);
 
             return salt;
         }

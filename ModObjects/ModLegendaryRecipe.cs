@@ -14,6 +14,7 @@ namespace BasicMod
         public string recipeIconPath = "Default Salt Recipe Icon.png";
         public string recipeBookmarkPath = "Default Salt Recipe Bookmark.png";
         public Sprite recipeIcon;
+        public string customAssetsPath;
 
         public ModLegendaryRecipe SetUnlockedByDefault(bool _b)
         {
@@ -57,14 +58,32 @@ namespace BasicMod
 
         public Sprite GetRecipeIcon() 
         {
-            Sprite sprite = SpriteLoader.LoadSpriteFromFile(recipeIconPath);
-            return sprite;
+            if (customAssetsPath != null)
+            {
+                Sprite sprite = SpriteLoader.LoadSpriteFromFile(recipeIconPath, customAssetsPath);
+                return sprite;
+            }
+            else
+            {
+
+                Sprite sprite = SpriteLoader.LoadSpriteFromFile(recipeIconPath);
+                return sprite;
+            }
         }
 
         public Sprite GetRecipeBookmark()
         {
-            Sprite sprite = SpriteLoader.LoadSpriteFromFile(recipeBookmarkPath);
-            return sprite;
+            if (customAssetsPath != null)
+            {
+                Sprite sprite = SpriteLoader.LoadSpriteFromFile(recipeIconPath, customAssetsPath);
+                return sprite;
+            }
+            else
+            {
+
+                Sprite sprite = SpriteLoader.LoadSpriteFromFile(recipeBookmarkPath);
+                return sprite;
+            }
         }
 
     }

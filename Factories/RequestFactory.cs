@@ -10,11 +10,11 @@ using UnityEngine;
 
 namespace BasicMod.Factories
 {
-    public class QuestFactory
+    public class RequestFactory
     {
-        public static List<ModQuestMaker> allQuests = new List<ModQuestMaker>();
-        public static EventHandler<EventArgs> onQuestsPreGenerate;
-        public static EventHandler<EventArgs> onQuestsPostGenerate;
+        public static List<JSONRequestMaker> allJSONRequests = new List<JSONRequestMaker>();
+        public static EventHandler<EventArgs> onRequestsPreGenerate;
+        public static EventHandler<EventArgs> onRequestsPostGenerate;
         public static EventHandler<EventArgs> onFactionsPreGenerate;
         public static bool doClearQuests = false;
 
@@ -30,12 +30,12 @@ namespace BasicMod.Factories
                 onFactionsPreGenerate?.Invoke(null, a);
 
                 EventArgs b = new EventArgs();
-                onQuestsPreGenerate?.Invoke(null, b);
+                onRequestsPreGenerate?.Invoke(null, b);
                 GenerateQuests();
                 AddQuests();
 
                 EventArgs c = new EventArgs();
-                onQuestsPostGenerate?.Invoke(null, c);
+                onRequestsPostGenerate?.Invoke(null, c);
 
             };
 
@@ -47,7 +47,7 @@ namespace BasicMod.Factories
 
         public static void GenerateQuests()
         {
-            foreach (ModQuestMaker quest in allQuests)
+            foreach (JSONRequestMaker quest in allJSONRequests)
             {
                 quest.GenerateQuest();
             }
@@ -95,12 +95,12 @@ namespace BasicMod.Factories
                    //Debug.Log(template.name);
                     PartContainerGroup<NonAppearancePart> potion_requests = template.groupsOfContainers[0];
                     
-                    var factionQuest = from quest in allQuests
+                    var factionQuest = from quest in allJSONRequests
                                        where quest.faction + "Quests" == template.name
                                        select quest;
 
                     var modPartContainer = new List<PartContainer<NonAppearancePart>>();
-                    foreach (ModQuestMaker quest in factionQuest)
+                    foreach (JSONRequestMaker quest in factionQuest)
                     {
 
                         var container = new PartContainer<NonAppearancePart>();
@@ -140,7 +140,7 @@ namespace BasicMod.Factories
         }
         public static void ConfigureQuests()
         {
-            foreach (ModQuestMaker quest in allQuests)
+            foreach (JSONRequestMaker quest in allJSONRequests)
             {
                 quest.ConfigureQuest();
             }

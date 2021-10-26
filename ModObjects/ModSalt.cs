@@ -21,6 +21,8 @@ namespace BasicMod
         public string recipeMarkIconPath ="";
         public string description;
 
+        public string customAssetsPath;
+
         public override string LocalizationKeyName => locName;
 
         public ModSalt SetGraphicsPaths(string _boxBottomPath = "", string _boxTopPath = "", string _ttIconPath ="", string _recipeIconPath = "")
@@ -55,32 +57,35 @@ namespace BasicMod
 
             CheckIfDefaultGraphics();
 
-            sharedVisualObject.boxRenderer.sprite = SpriteLoader.LoadSpriteFromFile(boxBottomPath);
-            topsprite.sprite = SpriteLoader.LoadSpriteFromFile(boxTopPath);
-            recipeMarkIcon = SpriteLoader.LoadSpriteFromFile(recipeMarkIconPath);
-            tooltipIcon = SpriteLoader.LoadSpriteFromFile(tooltipIconPath);
-        }
 
-        public  void CheckIfDefaultGraphics()
-        {
+
+            sharedVisualObject.boxRenderer.sprite = SpriteLoader.LoadSpriteFromFile(boxBottomPath,customAssetsPath);
+            topsprite.sprite = SpriteLoader.LoadSpriteFromFile(boxTopPath,customAssetsPath);
+            recipeMarkIcon = SpriteLoader.LoadSpriteFromFile(recipeMarkIconPath, customAssetsPath);
+            tooltipIcon = SpriteLoader.LoadSpriteFromFile(tooltipIconPath, customAssetsPath);
+
 
             
+        }
 
-            if (boxBottomPath == "")
+        public void CheckIfDefaultGraphics()
+        {
+
+            if (boxBottomPath == "" || boxBottomPath == null)
             {
-                boxBottomPath = "Default Salt Box Bottom.png";
+                boxBottomPath = "@Default Salt Box Bottom.png";
             }
-            if (boxTopPath == "")
+            if (boxTopPath == "" || boxTopPath == null)
             {
-                boxTopPath = "Default Salt Box Top.png";
+                boxTopPath = "@Default Salt Box Top.png";
             }
-            if (recipeMarkIconPath == "")
+            if (recipeMarkIconPath == "" || recipeMarkIconPath == null)
             {
-                recipeMarkIconPath = "Default Salt Recipe Mark.png";
+                recipeMarkIconPath = "@Default Salt Recipe Mark.png";
             }
-            if (tooltipIconPath == "")
+            if (tooltipIconPath == "" || tooltipIconPath == null)
             {
-               tooltipIconPath = "Default Salt Tool Tip.png";
+               tooltipIconPath = "@Default Salt Tool Tip.png";
             }
         }
         

@@ -25,18 +25,22 @@ namespace BasicMod
 			DoPatching();
 			Debug.Log("Loaded BasicMod!");
 
-			JSONQuestLoader.Awake();
+			JSONModLoader.Awake();
+			//JSONQuestLoader.Awake();
+			JSONRecipeLoader.Awake();
+			JSONSaltLoader.Awake();
+
 			DuplicateRecipes.Awake();
 			SaltFactory.Awake();
 			LegendaryRecipeFactory.Awake();
 			GoalFactory.Awake();
 			TalentFactory.Awake();
-			QuestFactory.Awake();
+			RequestFactory.Awake();
 
 
 			clearQuestConfig = Config.Bind("BasicMod Settings", "clearVanillaQuests", false, "Clears Vanilla Groundhog day potion requests. Useful when developing a requests pack.");
 
-			QuestFactory.doClearQuests = clearQuestConfig.Value;
+			RequestFactory.doClearQuests = clearQuestConfig.Value;
 			
 			NewGameEvent.OnNewGame += (_, e) =>
 			{

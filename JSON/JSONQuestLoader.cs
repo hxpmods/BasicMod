@@ -15,15 +15,15 @@ namespace BasicMod.JSON
 
     public static class JSONQuestLoader
     {
-        public static List<ModQuestMaker> loadedQuests = new List<ModQuestMaker>();
+        public static List<JSONRequestMaker> loadedQuests = new List<JSONRequestMaker>();
         public static void Awake()
         {
             ProcessDirectory("BepinEx/Plugins/JSON/Quests");
-            QuestFactory.onQuestsPreGenerate += (_, e) =>
+            RequestFactory.onRequestsPreGenerate += (_, e) =>
             {
                 if (loadedQuests.Count > 0)
                 {
-                    QuestFactory.allQuests.AddRange(loadedQuests);
+                    RequestFactory.allJSONRequests.AddRange(loadedQuests);
                 }
             };
             
@@ -65,7 +65,7 @@ namespace BasicMod.JSON
 
                 if (json.IsValidJSON())
                 {
-                    ModQuestMaker quest = deserialiseJSONQuests(json);
+                    JSONRequestMaker quest = deserialiseJSONQuests(json);
                     if (quest != null) loadedQuests.Add(quest);
                 }
                 else
@@ -85,11 +85,11 @@ namespace BasicMod.JSON
 
      
 
-        public static ModQuestMaker deserialiseJSONQuests(string json)
+        public static JSONRequestMaker deserialiseJSONQuests(string json)
         {
             try
             {
-                ModQuestMaker j = JsonConvert.DeserializeObject<ModQuestMaker>(json);
+                JSONRequestMaker j = JsonConvert.DeserializeObject<JSONRequestMaker>(json);
                 return j;
             }
             catch (Exception ex)
